@@ -12,9 +12,9 @@ void create_process_fork(){
 			case 0:
 				/* child process */
 				printf("child process %d (%d) entered criticall state!\n", process, getpid());
-				sleep(100);
+				sleep(1);
 				printf("child process %d (%d) leaved criticall state!\n", process, getpid());
-				sleep(100);
+				sleep(1);
 			default: 
 				/* father */
 				;
