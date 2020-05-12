@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <unistd.h>
+
 #include "prak1.h"
+
 
 void create_process_fork(){
 
