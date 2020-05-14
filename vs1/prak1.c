@@ -15,7 +15,7 @@ void create_process_fork(){
 	int status;
 
 	for (int process = 0; process < NUMBER_OF_PROCESSES; process++){
-		switch(pid[process] =  fork()) {
+		switch(pid[process] = fork()) {
 			case -1:
 				perror("Fork failed!!");
 				exit(1);
