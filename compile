@@ -1,1 +1,1 @@
-gcc -Wall main.c prak1.c -o main.sh
+gcc -Wall main.c prakt1.c -o main.sh
