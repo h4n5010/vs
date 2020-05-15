@@ -14,6 +14,19 @@ pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
 int sem_id;
 int sem_num;
+struct sembuf semaphore;
+
+void V(int sem_num){
+	semaphore.sem_num=sem_num;
+	semaphore.sem_op=1;
+	semaphore.sem_flg=~(IPC_NOWAIT|SEM_UNDO);
+	
+	if(semop(sem_id,&semaphore,1)){
+	
+		perror("Error in semopV()");
+		exit(1);
+	}
+}
 
 void init_sem(){
 
