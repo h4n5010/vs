@@ -1,3 +1,4 @@
 .*.swp
 .*.swo
 main.sh
+.DS_*
