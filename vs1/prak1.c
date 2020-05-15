@@ -17,6 +17,16 @@ void create_process_fork(){
 
 	int pid[NUMBER_OF_PROCESSES];
 	int status;
+	
+	if((sem_key = ftok (home, '1')) < 0){
+		perror("Error in ftok");
+		exit(1);
+	}
+
+	if((sem_id = semget(sem_key, 1, IPC_CREAT|0666)) < 0){
+		perror("Error in semget");
+		exit(1);
+	}
 
 	for (int process = 0; process < NUMBER_OF_PROCESSES; process++){
 		switch(pid[process] = fork()) {
