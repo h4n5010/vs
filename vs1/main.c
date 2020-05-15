@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "prak1.h"
+#include "prakt1.h"
 
 int main(){
 

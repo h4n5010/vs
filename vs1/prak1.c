@@ -11,14 +11,14 @@
 #include "prakt1.h"
 
 pid_t waitpid(pid_t pid, int *status, int ops);
+key_t sem_key;
+int sem_id;
+int sem_num;
+
+void init_sem(){
 
 
-void create_process_fork(){
-
-	int pid[NUMBER_OF_PROCESSES];
-	int status;
-	
-	if((sem_key = ftok (home, '1')) < 0){
+	if((sem_key = ftok (HOME, '1')) < 0){
 		perror("Error in ftok");
 		exit(1);
 	}
@@ -27,6 +27,22 @@ void create_process_fork(){
 		perror("Error in semget");
 		exit(1);
 	}
+
+	if(semctl(sem_id, sem_num, SETVAL, 1)<0){
+		perror("Error in semctl");
+		exit(1);
+	}
+}
+
+
+void create_process_fork(){
+
+	int pid[NUMBER_OF_PROCESSES];
+	int status;
+	
+	
+
+
 
 	for (int process = 0; process < NUMBER_OF_PROCESSES; process++){
 		switch(pid[process] = fork()) {
