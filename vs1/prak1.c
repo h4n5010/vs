@@ -40,10 +40,9 @@ void P(int sem_num){
 		perror("Error in semopV()");
 		exit(1);
 	}
-
+}
 
 void init_sem(){
-
 
 	if((sem_key = ftok (HOME, '1')) < 0){
 		perror("Error in ftok");
@@ -67,9 +66,7 @@ void create_process_fork(){
 	int pid[NUMBER_OF_PROCESSES];
 	int status;
 	
-	
-
-
+	init_sem();
 
 	for (int process = 0; process < NUMBER_OF_PROCESSES; process++){
 		switch(pid[process] = fork()) {
@@ -78,9 +75,11 @@ void create_process_fork(){
 				exit(1);
 			case 0:
 				/* child process */
+				P(sem_id);
 				printf("child process %d (%d) entered critical state!\n", process, getpid());
 				sleep(1);
 				printf("child process %d (%d) leaved critical state!\n", process, getpid());
+				V(sem_id);
 				sleep(1);
 			default: 
 				/* father */
@@ -91,3 +90,4 @@ void create_process_fork(){
 	printf("father process has stopped!\n");
 
 }
+
