@@ -3,8 +3,12 @@
 #include <sys/types.h> 
 #include <sys/wait.h>
 #include <unistd.h>
+#include <sys/msg.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
 
-#include "prak1.h"
+
+#include "prakt1.h"
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 
