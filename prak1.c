@@ -18,13 +18,13 @@ struct sembuf semaphore;
 
 /* Leave the sempahore */
 void V(int sem_num){
-	semaphore.sem_num = sem_num;
-	semaphore.sem_op = 1;
-	semaphore.sem_flg = ~(IPC_NOWAIT|SEM_UNDO);
+	semaphore.sem_num=sem_num;
+	semaphore.sem_op=1;
+	semaphore.sem_flg=~(IPC_NOWAIT|SEM_UNDO);
 	
-	if(semop(sem_id,&semaphore,1)){
+	if(semop(sem_id, &semaphore, 1)){
 	
-		perror("Error in semopV()");
+		perror("Error in semop V()");
 		exit(1);
 	}
 }
@@ -37,23 +37,32 @@ void P(int sem_num){
 	
 	if(semop(sem_id, &semaphore, 1)){
 	
-		perror("Error in semopP()");
+		perror("Error in semop P()");
 		exit(1);
 	}
 }
 
 void init_sem(){
 
+	/* Create unique semaphore key */
 	if((sem_key = ftok(HOME, '1')) < 0){
 		perror("Error in ftok");
 		exit(1);
+	} 
+	else{
+		printf("Sem_key: %d\n", sem_key);
 	}
-
+	
+	/* Open semaphore group and creates one */
 	if((sem_id = semget(sem_key, 1, IPC_CREAT|0666)) < 0){
 		perror("Error in semget");
 		exit(1);
 	}
-
+	else{
+		printf("Sem_ID: %d\n", sem_id);
+	}
+	
+	/* Intialize semaphore */
 	if(semctl(sem_id, sem_num, SETVAL, 1)<0){
 		perror("Error in semctl");
 		exit(1);
