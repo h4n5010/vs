@@ -84,12 +84,12 @@ void create_process_fork(){
 				exit(1);
 			case 0:
 				/* child process */
-				P(sem_id);
+				P(0);
 				printf("child process %d (%d) entered critical state!\n", process, getpid());
-				sleep(1);
+				sleep(5);
 				printf("child process %d (%d) leaved critical state!\n", process, getpid());
-				V(sem_id);
-				sleep(1);
+				V(0);
+				sleep(5);
 			default: 
 				/* father */
 				waitpid(pid[process], &status, 0);
