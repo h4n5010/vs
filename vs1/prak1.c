@@ -14,9 +14,35 @@ pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
 int sem_id;
 int sem_num;
+struct sembuf semaphore;
+
+/* Leave the sempahore */
+void V(int sem_num){
+	semaphore.sem_num = sem_num;
+	semaphore.sem_op = 1;
+	semaphore.sem_flg = ~(IPC_NOWAIT|SEM_UNDO);
+	
+	if(semop(sem_id,&semaphore,1)){
+	
+		perror("Error in semopV()");
+		exit(1);
+	}
+}
+
+/* Enter the sempahore */
+void P(int sem_num){
+	semaphore.sem_num = sem_num;
+	semaphore.sem_op = -1;
+	semaphore.sem_flg = ~(IPC_NOWAIT|SEM_UNDO);
+	
+	if(semop(sem_id,&semaphore,1)){
+	
+		perror("Error in semopV()");
+		exit(1);
+	}
+}
 
 void init_sem(){
-
 
 	if((sem_key = ftok (HOME, '1')) < 0){
 		perror("Error in ftok");
@@ -40,9 +66,7 @@ void create_process_fork(){
 	int pid[NUMBER_OF_PROCESSES];
 	int status;
 	
-	
-
-
+	init_sem();
 
 	for (int process = 0; process < NUMBER_OF_PROCESSES; process++){
 		switch(pid[process] = fork()) {
@@ -51,9 +75,11 @@ void create_process_fork(){
 				exit(1);
 			case 0:
 				/* child process */
+				P(sem_id);
 				printf("child process %d (%d) entered critical state!\n", process, getpid());
 				sleep(1);
 				printf("child process %d (%d) leaved critical state!\n", process, getpid());
+				V(sem_id);
 				sleep(1);
 			default: 
 				/* father */
@@ -64,3 +90,4 @@ void create_process_fork(){
 	printf("father process has stopped!\n");
 
 }
+
