@@ -16,10 +16,11 @@ int sem_id;
 int sem_num;
 struct sembuf semaphore;
 
+/* Leave the sempahore */
 void V(int sem_num){
-	semaphore.sem_num=sem_num;
-	semaphore.sem_op=1;
-	semaphore.sem_flg=~(IPC_NOWAIT|SEM_UNDO);
+	semaphore.sem_num = sem_num;
+	semaphore.sem_op = 1;
+	semaphore.sem_flg = ~(IPC_NOWAIT|SEM_UNDO);
 	
 	if(semop(sem_id,&semaphore,1)){
 	
@@ -27,6 +28,19 @@ void V(int sem_num){
 		exit(1);
 	}
 }
+
+/* Enter the sempahore */
+void P(int sem_num){
+	semaphore.sem_num = sem_num;
+	semaphore.sem_op = -1;
+	semaphore.sem_flg = ~(IPC_NOWAIT|SEM_UNDO);
+	
+	if(semop(sem_id,&semaphore,1)){
+	
+		perror("Error in semopV()");
+		exit(1);
+	}
+
 
 void init_sem(){
 
