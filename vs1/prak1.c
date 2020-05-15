@@ -6,7 +6,7 @@
 #include <sys/msg.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
-
+#include <sys/ipc.h>
 
 #include "prakt1.h"
 
@@ -35,16 +35,16 @@ void P(int sem_num){
 	semaphore.sem_op = -1;
 	semaphore.sem_flg = ~(IPC_NOWAIT|SEM_UNDO);
 	
-	if(semop(sem_id,&semaphore,1)){
+	if(semop(sem_id, &semaphore, 1)){
 	
-		perror("Error in semopV()");
+		perror("Error in semopP()");
 		exit(1);
 	}
 }
 
 void init_sem(){
 
-	if((sem_key = ftok (HOME, '1')) < 0){
+	if((sem_key = ftok(HOME, '1')) < 0){
 		perror("Error in ftok");
 		exit(1);
 	}
