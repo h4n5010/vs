@@ -109,19 +109,6 @@ int main(){
         }
     }
 
-    omp_set_num_threads(4);
-#pragma omp parallel private(tid)
-
-    tid = omp_get_thread_num();
-    printf("hello world from thread = %d\n", tid);
-#pragma omp barrier
-    if (tid == 0){
-        nthreads = omp_get_num_threads();
-        printf("threads = %d\n", nthreads);
-    }
-
-
-    /* All threads join master thread and terminate */
 
 }
 
