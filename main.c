@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#include "main.h"
 
 #define PHILOSOPHEN 5
 
