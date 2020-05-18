@@ -21,6 +21,7 @@ int sem_id;
 int sem_num;
 struct sembuf semaphore;
 
+// Struct for all philsoph data
 typedef struct {
     int id;
     int essen_zeit;
@@ -28,7 +29,7 @@ typedef struct {
     int gabel[2];
 } philosoph[PHILOSOPHEN];
 
-/* Leave the sempahore */
+// Leave the sempahore
 void V(int sem_num){
     semaphore.sem_num=sem_num;
     semaphore.sem_op=1;
@@ -41,7 +42,7 @@ void V(int sem_num){
     }
 }
 
-/* Enter the sempahore */
+// Enter the sempahore
 void P(int sem_num){
     semaphore.sem_num = sem_num;
     semaphore.sem_op = -1;
@@ -53,9 +54,6 @@ void P(int sem_num){
         exit(1);
     }
 }
-
-
-
 
 // Initializes Semaphores and philosophes
 void init_App(){
@@ -85,30 +83,28 @@ void init_App(){
             exit(1);
         }
     }
+
 }
 
 int main(){
 
     init_App();
+    int i = PHILOSOPHEN;
+
+    // Fork all philsophs, but only from father process
+    do{
+       int fork_return = fork();
+       // Decrem
+       i--;
+    } while(fork_return != 0 && i != 0);
+
+
     srand(time(NULL));
-    int nthreads, tid;
 
-    philosoph leute;
+    // Init the one philosoph of the current task
+    philosoph p;
 
-    for(int i = 0; i < PHILOSOPHEN; i++){
-        leute[i].essen_zeit = rand() % 11; // random time between 0 and 10
-        leute[i].id = i;
-        do {
-            int time = rand() % 11;
-            leute[i].denk_zeit = time;
-        } while (time == leute[i].essen_zeit);
-        leute[i].gabel[0] = i;
-        if (i == 0){
-            leute[i].gabel[1] = 4;
-        } else {
-            leute[i].gabel[1] = i + 1;
-        }
-    }
+
 
 
 
