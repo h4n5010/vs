@@ -13,12 +13,14 @@
 
 
 #define PHILOSOPHEN 5
+#define HOME "/home/florian/vs"
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
 int sem_id;
 int sem_num;
 struct sembuf semaphore;
+
 
 // Struct for all philsoph data
 typedef struct {
@@ -75,14 +77,12 @@ void init_App(){
         printf("Sem_ID: %d\n", sem_id);
     }
 
-    // Intialize semaphore
     for(int i = 0; i < 5; i++){
         if(semctl(sem_id, i, SETVAL, 1)<0){
             perror("Error in semctl");
             exit(1);
         }
     }
-
 }
 
 int main(){
@@ -91,9 +91,10 @@ int main(){
     int i = PHILOSOPHEN;
 
     // Fork all philsophs, but only from father process
+    int fork_return = -1;
     do{
-       int fork_return = fork();
-       // Decrem
+       fork_return = fork();
+       // Decrement the counter
        i--;
     } while(fork_return != 0 && i != 0);
 
@@ -102,13 +103,7 @@ int main(){
     // Init the random number generator with time seed
     srand(time(NULL));
     // Init necessary variables for the philosoph "object"
-    p.essen_zeit = srand() % 11;
-    p.denk_zeit = srand() % 11;
-
-
-
-
-
-
+    p->eating_time = rand() % 11;
+    p->think_time = rand() % 11;
 
 }
