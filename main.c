@@ -24,9 +24,9 @@ struct sembuf semaphore;
 // Struct for all philsoph data
 typedef struct {
     int id;
-    int essen_zeit;
-    int denk_zeit;
-    int gabel[2];
+    int eating_time;
+    int think_time;
+    int fork[2];
 } philosoph[PHILOSOPHEN];
 
 // Leave the sempahore
@@ -98,11 +98,15 @@ int main(){
        i--;
     } while(fork_return != 0 && i != 0);
 
-
-    srand(time(NULL));
-
     // Init the one philosoph of the current task
     philosoph p;
+    // Init the random number generator with time seed
+    srand(time(NULL));
+    // Init necessary variables for the philosoph "object"
+    p.essen_zeit = srand() % 11;
+    p.denk_zeit = srand() % 11;
+
+
 
 
 
