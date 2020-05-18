@@ -55,10 +55,12 @@ void P(int sem_num){
 }
 
 
-/* Initializes Semaphores */
-void init_sem(){
 
-    /* Create unique semaphore key */
+
+// Initializes Semaphores and philosophes
+void init_App(){
+
+    // Create unique semaphore key
     if((sem_key = ftok(HOME, '1')) < 0){
         perror("Error in ftok");
         exit(1);
@@ -67,7 +69,7 @@ void init_sem(){
         printf("Sem_key: %d\n", sem_key);
     }
 
-    /* Open semaphore group and creates one */
+    // Open semaphore group and creates one
     if((sem_id = semget(sem_key, 5, IPC_CREAT|0666)) < 0){
         perror("Error in semget");
         exit(1);
@@ -76,7 +78,7 @@ void init_sem(){
         printf("Sem_ID: %d\n", sem_id);
     }
 
-    /* Intialize semaphore */
+    // Intialize semaphore
     for(int i = 0; i < 5; i++){
         if(semctl(sem_id, i, SETVAL, 1)<0){
             perror("Error in semctl");
@@ -85,10 +87,9 @@ void init_sem(){
     }
 }
 
-
 int main(){
 
-    //init_sem();
+    init_App();
     srand(time(NULL));
     int nthreads, tid;
 
