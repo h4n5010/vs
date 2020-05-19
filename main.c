@@ -106,7 +106,7 @@ int main(){
     }*/
     int id = 1; // Init the id with a positive digit for the while loop
     int i = 0; // Index for the while loop
-    while (id != 0 && i < PHILOSOPHS - 1){ // Somehow i need decrement the philsophs variable idk
+    while (id != 0 && i < PHILOSOPHS - 1){ // Somehow i need decrement the philosophs variable idk
         id = fork();
         if(id == -1) {
             printf("Error in fork!\n");
@@ -139,7 +139,7 @@ int main(){
     while(ITERATIONS){
         sleep(p.think_time);
         P(p.fork[0]);
-        P(p.fork[1]);
+        P(p.fork[1]); // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
         printf("Philosoph %d: I start to eat!", i);
         sleep(p.eating_time);
         V(p.fork[0]);
