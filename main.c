@@ -12,7 +12,7 @@
 
 #define PHILOSOPHS 5
 #define HOME "/home/florian/vs"
-#define ITERATIONS 1
+#define ITERATIONS 3
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
@@ -113,11 +113,11 @@ int main(){
             exit(1);
         }
         else if (id == 0){
-            printf("Child process, ID: %d created\n", i);
+            //printf("Child process, ID: %d created\n", i);
 
         }
         else{
-            printf("Father process\n");
+            //printf("Father process\n");
             i++;
         }
     }
@@ -130,34 +130,48 @@ int main(){
     // Init necessary variables for the philosoph "object"
     p.eating_time = (rand() % 10) + 1;
     p.think_time = (rand() % 10) + 1;
-    printf("Philosoph %d has Eat time: %d\n", i, p.eating_time);
-    printf("Philosoph %d has Think time: %d\n", i, p.think_time);
+    printf("P%d has Eat time: %d\n", i, p.eating_time);
+    printf("P%d has Think time: %d\n", i, p.think_time);
 
     // Assign 2 forks to the process
     p.fork[0] = i;
-    printf("Philosoph %d: I selected fork %d!\n", i, p.fork[0]);
+    printf("P%d: I selected fork %d!\n", i, p.fork[0]);
     p.fork[1] = ++i;
     if(i == PHILOSOPHS - 1){
         p.fork[1] = 0;
     }
-    printf("Philosoph %d: I selected fork %d!\n", i, p.fork[1]);
+    printf("P%d: I selected fork %d!\n", i, p.fork[1]);
 
+    sleep(5);
     for(int j = 0; i < ITERATIONS; j++){
         sleep(p.think_time);
+        /*if(i == PHILOSOPHS -1){
+            P(p.fork[1]);
+            printf("P%d: Took fork %d!\n", i, p.fork[1]);
+            P(p.fork[0]);
+            printf("P%d: Took fork %d!\n", i, p.fork[0]);
+        }
+        else{
+            P(p.fork[0]);
+            printf("P%d: Took fork %d!\n", i, p.fork[0]);
+            P(p.fork[1]);                                // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
+            printf("P%d: Took fork %d!\n", i, p.fork[1]);
+        }*/
         P(p.fork[0]);
-        printf("Took fork %d!\n", p.fork[0]);
+        printf("P%d: Took fork %d!\n", i, p.fork[0]);
         P(p.fork[1]);                                // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
-        printf("Took fork %d!\n", p.fork[1]);
-        printf("Philosoph %d: I start to eat!\n", i);
+        printf("P%d: Took fork %d!\n", i, p.fork[1]);
+        printf("P%d: I start to eat!\n\n", i);
         sleep(p.eating_time);
 
         V(p.fork[0]);
-        printf("Took fork %d!\n", p.fork[0]);
+        printf("P%d: Released fork %d!\n", i, p.fork[0]);
         V(p.fork[1]);
-        printf("Took fork %d!\n", p.fork[1]);
-        printf("Philosoph %d: I stopped eating!\n", i);
+        printf("P%d: Released fork %d!\n", i, p.fork[1]);
+        printf("P%d: I stopped eating!\n", i);
+        printf("I need to eat %d more times!\n\n", PHILOSOPHS - j);
     }
 
-    printf("Philosoph %d: I finished eating and thinking!\n", i);
+    printf("P%d: I finished eating and thinking!\n\n", i);
     return 0;
 }
