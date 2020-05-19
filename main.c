@@ -12,7 +12,7 @@
 
 #define PHILOSOPHS 5
 #define HOME "/home/florian/vs"
-#define ITERATIONS 3
+#define ITERATIONS 1
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
@@ -142,7 +142,7 @@ int main(){
     }
     printf("Philosoph %d: I selected fork %d!\n", i, p.fork[1]);
 
-    while(ITERATIONS){
+    for(int j = 0; i < ITERATIONS; j++){
         sleep(p.think_time);
         P(p.fork[0]);
         printf("Took fork %d!\n", p.fork[0]);
