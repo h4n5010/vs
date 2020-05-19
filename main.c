@@ -113,23 +113,24 @@ int main(){
             exit(1);
         }
         else if (id == 0){
+            printf("Child process, ID: %d created\n", i);
         }
         else{
             printf("Father process\n");
-            pid[i] = id;
-            printf("Child process, ID: %d created\n", pid[i]);
             i++;
         }
     }
 
     // Init the one philosoph of the current task
     philosoph p;
+
     // Init the random number generator with time seed
     srand(time(NULL));
     // Init necessary variables for the philosoph "object"
     p.eating_time = rand() % 11;
     p.think_time = rand() % 11;
-    printf("Eat time: %d", p.eating_time);
+    printf("Philosoph %d has Eat time: %d\n", i, p.eating_time);
+    printf("Philosoph %d has Think time: %d\n", i, p.think_time);
 
     // Assign 2 forks to the process
     p.fork[0] = i;
@@ -141,7 +142,7 @@ int main(){
     while(ITERATIONS){
         sleep(p.think_time);
         P(p.fork[0]);
-        P(p.fork[1]); // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
+        P(p.fork[1]);               // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
         printf("Philosoph %d: I start to eat!", i);
         sleep(p.eating_time);
         V(p.fork[0]);
