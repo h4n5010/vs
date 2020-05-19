@@ -12,7 +12,7 @@
 
 #define PHILOSOPHS 5
 #define HOME "/home/florian/vs"
-#define ITERATIONS 15
+#define ITERATIONS 3
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
@@ -135,22 +135,29 @@ int main(){
 
     // Assign 2 forks to the process
     p.fork[0] = i;
-    p.fork[1] = i++;
-    if(i == PHILOSOPHS){
+    printf("Philosoph %d: I selected fork %d!\n", i, p.fork[0]);
+    p.fork[1] = ++i;
+    if(i == PHILOSOPHS - 1){
         p.fork[1] = 0;
     }
+    printf("Philosoph %d: I selected fork %d!\n", i, p.fork[1]);
 
     while(ITERATIONS){
         sleep(p.think_time);
         P(p.fork[0]);
-        P(p.fork[1]);               // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
-        printf("Philosoph %d: I start to eat!", i);
+        printf("Took fork %d!\n", p.fork[0]);
+        P(p.fork[1]);                                // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
+        printf("Took fork %d!\n", p.fork[1]);
+        printf("Philosoph %d: I start to eat!\n", i);
         sleep(p.eating_time);
+
         V(p.fork[0]);
+        printf("Took fork %d!\n", p.fork[0]);
         V(p.fork[1]);
-        printf("Philosoph %d: I stopped eating!", i);
+        printf("Took fork %d!\n", p.fork[1]);
+        printf("Philosoph %d: I stopped eating!\n", i);
     }
 
-    printf("Philosoph %d: I finished eating and thinking!", i);
+    printf("Philosoph %d: I finished eating and thinking!\n", i);
     return 0;
 }
