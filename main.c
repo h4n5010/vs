@@ -114,6 +114,7 @@ int main(){
         }
         else if (id == 0){
             printf("Child process, ID: %d created\n", i);
+
         }
         else{
             printf("Father process\n");
@@ -125,10 +126,10 @@ int main(){
     philosoph p;
 
     // Init the random number generator with time seed
-    srand(time(NULL));
+    srand(time(NULL) - i*2);
     // Init necessary variables for the philosoph "object"
-    p.eating_time = rand() % 11;
-    p.think_time = rand() % 11;
+    p.eating_time = (rand() % 10) + 1;
+    p.think_time = (rand() % 10) + 1;
     printf("Philosoph %d has Eat time: %d\n", i, p.eating_time);
     printf("Philosoph %d has Think time: %d\n", i, p.think_time);
 
