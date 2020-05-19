@@ -129,6 +129,8 @@ int main(){
     // Init necessary variables for the philosoph "object"
     p.eating_time = rand() % 11;
     p.think_time = rand() % 11;
+    printf("Eat time: %d", p.eating_time);
+
     // Assign 2 forks to the process
     p.fork[0] = i;
     p.fork[1] = i++;
