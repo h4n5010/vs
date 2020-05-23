@@ -19,7 +19,7 @@ key_t sem_key;
 int sem_id;
 int sem_num;
 struct sembuf semaphore;
-int pid[5] = {0,0,0,0,0};
+//int pid[5] = {0,0,0,0,0};
 
 
 // Struct for all philsoph data
@@ -88,22 +88,6 @@ void init_App(){
 int main(){
 
     init_App();
-
-    // Fork all philsophs, but only from father process
-   /* for (int process = 0; process < PHILOSOPHS; process++){
-        switch(fork()) {
-            case -1:
-                perror("Fork failed!\n");
-                exit(1);
-            case 0:
-                // child process
-                printf("Child process created!\n");
-                break;
-            default:
-                break;
-                // father
-        }
-    }*/
     int id = 1; // Init the id with a positive digit for the while loop
     int i = 0; // Index for the while loop
     while (id != 0 && i < PHILOSOPHS - 1){ // Somehow i need decrement the philosophs variable idk
@@ -135,12 +119,12 @@ int main(){
 
     // Assign 2 forks to the process
     p.fork[0] = i;
-    printf("P%d: I selected fork %d!\n", i, p.fork[0]);
     p.fork[1] = ++i;
     if(i == PHILOSOPHS - 1){
         p.fork[1] = 0;
     }
-    printf("P%d: I selected fork %d!\n", i, p.fork[1]);
+    printf("P%d: My forks are %d and %d!\n\n", i - 1, p.fork[0], p.fork[1]);
+    //printf("P%d: I selected fork %d!\n", i, p.fork[1]);
 
     sleep(5);
     for(int j = 0; i < ITERATIONS; j++){
