@@ -11,7 +11,7 @@
 
 
 #define PHILOSOPHS 5
-#define HOME "/home/florian/vs"
+#define HOME "/home/pi/vs"
 #define ITERATIONS 3
 
 pid_t waitpid(pid_t pid, int *status, int ops);
@@ -19,7 +19,6 @@ key_t sem_key;
 int sem_id;
 int sem_num;
 struct sembuf semaphore;
-//int pid[5] = {0,0,0,0,0};
 
 
 // Struct for all philsoph data
@@ -88,25 +87,27 @@ void init_App(){
 int main(){
 
     init_App();
-    int id = 1; // Init the id with a positive digit for the while loop
-    int i = 0; // Index for the while loop
-    while (id != 0 && i < PHILOSOPHS - 1){ // Somehow i need decrement the philosophs variable idk
+    int id = 1;					// Init the id with a positive digit for the while loop
+    int i = 0; 					// Index for the while loop
+    while (id != 0 && i < PHILOSOPHS - 1){	// Somehow i need decrement the philosophs variable idk
         id = fork();
         if(id == -1) {
             printf("Error in fork!\n");
             exit(1);
         }
+
         else if (id == 0){
-            //printf("Child process, ID: %d created\n", i);
+            // Child process path
 
         }
+
         else{
-            //printf("Father process\n");
+            // Father process path
             i++;
         }
     }
 
-    // Init the one philosoph of the current task
+    // Init philosoph struct for current process
     philosoph p;
 
     // Init the random number generator with the current process id
@@ -118,7 +119,7 @@ int main(){
 
     // Assign 2 forks to the process
     p.fork[0] = i;
-    p.fork[1] = ++i;
+    p.fork[1] = (i + 1);
     if(i == PHILOSOPHS - 1){ // Special case: last philosopher has to take the first fork again
         p.fork[1] = 0;
     }
