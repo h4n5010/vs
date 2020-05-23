@@ -109,26 +109,24 @@ int main(){
     // Init the one philosoph of the current task
     philosoph p;
 
-    // Init the random number generator with time seed
-    srand(time(NULL) - i*2);
+    // Init the random number generator with the current process id
+    srand(i);
+
     // Init necessary variables for the philosoph "object"
     p.eating_time = (rand() % 10) + 1;
     p.think_time = (rand() % 10) + 1;
-    printf("P%d has Eat time: %d\n", i, p.eating_time);
-    printf("P%d has Think time: %d\n", i, p.think_time);
 
     // Assign 2 forks to the process
     p.fork[0] = i;
     p.fork[1] = ++i;
-    if(i == PHILOSOPHS - 1){
+    if(i == PHILOSOPHS - 1){ // Special case: last philosopher has to take the first fork again
         p.fork[1] = 0;
     }
     printf("P%d: My forks are %d and %d!\n\n", i - 1, p.fork[0], p.fork[1]);
     //printf("P%d: I selected fork %d!\n", i, p.fork[1]);
 
     sleep(5);
-    for(int j = 0; i < ITERATIONS; j++){
-        sleep(p.think_time);
+    for(int j = 0; j < ITERATIONS; j++){
         /*if(i == PHILOSOPHS -1){
             P(p.fork[1]);
             printf("P%d: Took fork %d!\n", i, p.fork[1]);
@@ -141,10 +139,17 @@ int main(){
             P(p.fork[1]);                                // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
             printf("P%d: Took fork %d!\n", i, p.fork[1]);
         }*/
+        // Think for the given time in the philosophs struct
+        printf("P%d: I started thinking!\n\n", i);
+        sleep(p.think_time);
+
+        // Try to eat
         P(p.fork[0]);
         printf("P%d: Took fork %d!\n", i, p.fork[0]);
+
         P(p.fork[1]);                                // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
         printf("P%d: Took fork %d!\n", i, p.fork[1]);
+
         printf("P%d: I start to eat!\n\n", i);
         sleep(p.eating_time);
 
@@ -153,7 +158,11 @@ int main(){
         V(p.fork[1]);
         printf("P%d: Released fork %d!\n", i, p.fork[1]);
         printf("P%d: I stopped eating!\n", i);
-        printf("I need to eat %d more times!\n\n", PHILOSOPHS - j);
+        printf("I need to eat %d more times!\n\n", ITERATIONS - (1+j));
+
+        // New random times for thinking and eating
+        p.eating_time = rand() % 11;
+        p.think_time = rand() % 12;
     }
 
     printf("P%d: I finished eating and thinking!\n\n", i);
