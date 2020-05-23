@@ -23,7 +23,6 @@ struct sembuf semaphore;
 
 // Struct for all philsoph data
 typedef struct {
-    int id;
     int eating_time;
     int think_time;
     int fork[2];
@@ -75,7 +74,8 @@ void init_App(){
     else{
         printf("Sem_ID: %d\n", sem_id);
     }
-
+	
+    // Setup all semaphores in the semaphore group
     for(int i = 0; i < 5; i++){
         if(semctl(sem_id, i, SETVAL, 1)<0){
             perror("Error in semctl\n");
@@ -113,57 +113,42 @@ int main(){
     // Init the random number generator with the current process id
     srand(i);
 
-    // Init necessary variables for the philosoph "object"
-    p.eating_time = (rand() % 10) + 1;
-    p.think_time = (rand() % 10) + 1;
-
     // Assign 2 forks to the process
     p.fork[0] = i;
     p.fork[1] = (i + 1);
     if(i == PHILOSOPHS - 1){ // Special case: last philosopher has to take the first fork again
         p.fork[1] = 0;
     }
-    printf("P%d: My forks are %d and %d!\n\n", i - 1, p.fork[0], p.fork[1]);
-    //printf("P%d: I selected fork %d!\n", i, p.fork[1]);
-
-    sleep(5);
+    printf("P%d: My forks are %d and %d!\n\n", i, p.fork[0], p.fork[1]);
+	
+    // main loop for philosopher problem
     for(int j = 0; j < ITERATIONS; j++){
-        /*if(i == PHILOSOPHS -1){
-            P(p.fork[1]);
-            printf("P%d: Took fork %d!\n", i, p.fork[1]);
-            P(p.fork[0]);
-            printf("P%d: Took fork %d!\n", i, p.fork[0]);
-        }
-        else{
-            P(p.fork[0]);
-            printf("P%d: Took fork %d!\n", i, p.fork[0]);
-            P(p.fork[1]);                                // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
-            printf("P%d: Took fork %d!\n", i, p.fork[1]);
-        }*/
+	
+	// Random values for eating and thinking
+	p.eating_time = rand() % 11;
+	p.think_time = rand() % 11;
+
         // Think for the given time in the philosophs struct
-        printf("P%d: I started thinking!\n\n", i);
+        printf("P%d: I started thinking!\n", i);
         sleep(p.think_time);
 
         // Try to eat
-        P(p.fork[0]);
+        P(p.fork[0]); // Try to take first fork (semaphore)
         printf("P%d: Took fork %d!\n", i, p.fork[0]);
 
-        P(p.fork[1]);                                // Some kind of timer is needed, that fork[0] is dropped, if the process can't get fork[1]
+        P(p.fork[1]); // Try to take second fork (semaphore)
         printf("P%d: Took fork %d!\n", i, p.fork[1]);
 
-        printf("P%d: I start to eat!\n\n", i);
-        sleep(p.eating_time);
-
-        V(p.fork[0]);
+        printf("P%d: I start to eat!\n", i);
+        sleep(p.eating_time); // Process stops for the duration of eating
+	
+	// Stop eating
+        V(p.fork[0]); // Release first fork (semaphore)
         printf("P%d: Released fork %d!\n", i, p.fork[0]);
-        V(p.fork[1]);
+        V(p.fork[1]); // Release second fork (semaphore)
         printf("P%d: Released fork %d!\n", i, p.fork[1]);
-        printf("P%d: I stopped eating!\n", i);
-        printf("I need to eat %d more times!\n\n", ITERATIONS - (1+j));
 
-        // New random times for thinking and eating
-        p.eating_time = rand() % 11;
-        p.think_time = rand() % 12;
+        printf("P%d: I stopped eating!\n", i);
     }
 
     printf("P%d: I finished eating and thinking!\n\n", i);
