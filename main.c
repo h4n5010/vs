@@ -8,12 +8,11 @@
 #include <sys/shm.h>
 #include <sys/ipc.h>
 #include <time.h>
-#include <stdlib.h>
-#include <omp.h>
 
-#include "main.h"
 
-#define PHILOSOPHEN 5
+#define PHILOSOPHS 5
+#define HOME "/home/pi/vs"
+#define ITERATIONS 3
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
@@ -21,14 +20,15 @@ int sem_id;
 int sem_num;
 struct sembuf semaphore;
 
-typedef struct {
-    int id;
-    int essen_zeit;
-    int denk_zeit;
-    int gabel[2];
-} philosoph[PHILOSOPHEN];
 
-/* Leave the sempahore */
+// Struct for all philsoph data
+typedef struct {
+    int eating_time;
+    int think_time;
+    int fork[2];
+} philosoph;
+
+// Leave the sempahore
 void V(int sem_num){
     semaphore.sem_num=sem_num;
     semaphore.sem_op=1;
@@ -36,12 +36,12 @@ void V(int sem_num){
 
     if(semop(sem_id, &semaphore, 1)){
 
-        perror("Error in semop V()");
+        perror("Error in semop V()\n");
         exit(1);
     }
 }
 
-/* Enter the sempahore */
+// Enter the sempahore
 void P(int sem_num){
     semaphore.sem_num = sem_num;
     semaphore.sem_op = -1;
@@ -49,80 +49,108 @@ void P(int sem_num){
 
     if(semop(sem_id, &semaphore, 1)){
 
-        perror("Error in semop P()");
+        perror("Error in semop P()\n");
         exit(1);
     }
 }
 
+// Initializes Semaphores and philosophes
+void init_App(){
 
-/* Initializes Semaphores */
-void init_sem(){
-
-    /* Create unique semaphore key */
+    // Create unique semaphore key
     if((sem_key = ftok(HOME, '1')) < 0){
-        perror("Error in ftok");
+        perror("Error in ftok\n");
         exit(1);
     }
     else{
         printf("Sem_key: %d\n", sem_key);
     }
 
-    /* Open semaphore group and creates one */
+    // Open semaphore group and creates one
     if((sem_id = semget(sem_key, 5, IPC_CREAT|0666)) < 0){
-        perror("Error in semget");
+        perror("Error in semget\n");
         exit(1);
     }
     else{
         printf("Sem_ID: %d\n", sem_id);
     }
-
-    /* Intialize semaphore */
+	
+    // Setup all semaphores in the semaphore group
     for(int i = 0; i < 5; i++){
         if(semctl(sem_id, i, SETVAL, 1)<0){
-            perror("Error in semctl");
+            perror("Error in semctl\n");
             exit(1);
         }
     }
 }
 
-
 int main(){
 
-    //init_sem();
-    srand(time(NULL));
-    int nthreads, tid;
+    init_App();
+    int id = 1;					// Init the id with a positive digit for the while loop
+    int i = 0; 					// Index for the while loop
+    while (id != 0 && i < PHILOSOPHS - 1){	// Somehow i need decrement the philosophs variable idk
+        id = fork();
+        if(id == -1) {
+            printf("Error in fork!\n");
+            exit(1);
+        }
 
-    philosoph leute;
+        else if (id == 0){
+            // Child process path
 
-    for(int i = 0; i < PHILOSOPHEN; i++){
-        leute[i].essen_zeit = rand() % 11; // random time between 0 and 10
-        leute[i].id = i;
-        do {
-            int time = rand() % 11;
-            leute[i].denk_zeit = time;
-        } while (time == leute[i].essen_zeit);
-        leute[i].gabel[0] = i;
-        if (i == 0){
-            leute[i].gabel[1] = 4;
-        } else {
-            leute[i].gabel[1] = i + 1;
+        }
+
+        else{
+            // Father process path
+            i++;
         }
     }
 
-    omp_set_num_threads(4);
-#pragma omp parallel private(tid)
+    // Init philosoph struct for current process
+    philosoph p;
 
-    tid = omp_get_thread_num();
-    printf("hello world from thread = %d\n", tid);
-#pragma omp barrier
-    if (tid == 0){
-        nthreads = omp_get_num_threads();
-        printf("threads = %d\n", nthreads);
+    // Init the random number generator with the current process id
+    srand(i);
+
+    // Assign 2 forks to the process
+    p.fork[0] = i;
+    p.fork[1] = (i + 1);
+    if(i == PHILOSOPHS - 1){ // Special case: last philosopher has to take the first fork again
+        p.fork[1] = 0;
+    }
+    printf("P%d: My forks are %d and %d!\n\n", i, p.fork[0], p.fork[1]);
+	
+    // main loop for philosopher problem
+    for(int j = 0; j < ITERATIONS; j++){
+	
+	// Random values for eating and thinking
+	p.eating_time = rand() % 11;
+	p.think_time = rand() % 11;
+
+        // Think for the given time in the philosophs struct
+        printf("P%d: I started thinking!\n", i);
+        sleep(p.think_time);
+
+        // Try to eat
+        P(p.fork[0]); // Try to take first fork (semaphore)
+        printf("P%d: Took fork %d!\n", i, p.fork[0]);
+
+        P(p.fork[1]); // Try to take second fork (semaphore)
+        printf("P%d: Took fork %d!\n", i, p.fork[1]);
+
+        printf("P%d: I start to eat!\n", i);
+        sleep(p.eating_time); // Process stops for the duration of eating
+	
+	// Stop eating
+        V(p.fork[0]); // Release first fork (semaphore)
+        printf("P%d: Released fork %d!\n", i, p.fork[0]);
+        V(p.fork[1]); // Release second fork (semaphore)
+        printf("P%d: Released fork %d!\n", i, p.fork[1]);
+
+        printf("P%d: I stopped eating!\n", i);
     }
 
-
-    /* All threads join master thread and terminate */
-
+    printf("P%d: I finished eating and thinking!\n\n", i);
+    return 0;
 }
-
-
