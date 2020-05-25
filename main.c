@@ -21,13 +21,6 @@ int sem_num;
 struct sembuf semaphore;
 
 
-// Struct for all philsoph data
-typedef struct {
-    int eating_time;
-    int think_time;
-    int fork[2];
-} philosoph;
-
 // Leave the sempahore
 void V(int sem_num){
     semaphore.sem_num=sem_num;
@@ -85,72 +78,5 @@ void init_App(){
 }
 
 int main(){
-
-    init_App();
-    int id = 1;					// Init the id with a positive digit for the while loop
-    int i = 0; 					// Index for the while loop
-    while (id != 0 && i < PHILOSOPHS - 1){	// Somehow i need decrement the philosophs variable idk
-        id = fork();
-        if(id == -1) {
-            printf("Error in fork!\n");
-            exit(1);
-        }
-
-        else if (id == 0){
-            // Child process path
-
-        }
-
-        else{
-            // Father process path
-            i++;
-        }
-    }
-
-    // Init philosoph struct for current process
-    philosoph p;
-
-    // Init the random number generator with the current process id
-    srand(i);
-
-    // Assign 2 forks to the process
-    p.fork[0] = i;
-    p.fork[1] = (i + 1);
-    if(i == PHILOSOPHS - 1){ // Special case: last philosopher has to take the first fork again
-        p.fork[1] = 0;
-    }
-    printf("P%d: My forks are %d and %d!\n\n", i, p.fork[0], p.fork[1]);
-	
-    // main loop for philosopher problem
-    for(int j = 0; j < ITERATIONS; j++){
-	
-	// Random values for eating and thinking
-	p.eating_time = rand() % 11;
-	p.think_time = rand() % 11;
-
-        // Think for the given time in the philosophs struct
-        printf("P%d: I started thinking!\n", i);
-        sleep(p.think_time);
-
-        // Try to eat
-        P(p.fork[0]); // Try to take first fork (semaphore)
-        printf("P%d: Took fork %d!\n", i, p.fork[0]);
-
-        P(p.fork[1]); // Try to take second fork (semaphore)
-        printf("P%d: Took fork %d!\n", i, p.fork[1]);
-
-        printf("P%d: I start to eat!\n", i);
-        sleep(p.eating_time); // Process stops for the duration of eating
-	
-	// Stop eating
-        V(p.fork[0]); // Release first fork (semaphore)
-        printf("P%d: Released fork %d!\n", i, p.fork[0]);
-        V(p.fork[1]); // Release second fork (semaphore)
-        printf("P%d: Released fork %d!\n", i, p.fork[1]);
-
-        printf("P%d: I stopped eating!\n", i);
-    }
-
-    printf("P%d: I finished eating and thinking!\n\n", i);
-    return 0;
+	return 0;
 }
