@@ -4,4 +4,5 @@ main.sh
 .DS_*
 .idea
 prakt1.h
+main.sh
 CMakeLists.txt
