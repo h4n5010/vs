@@ -13,11 +13,16 @@
 #define HOME "/home/pi/vs"
 #define NUMBER_OF_WRITERS 2
 #define NUMBER_OF_READERS 5
+#define READER 0
+#define WRITER 1
+#define MUTEX 2
+#define ITERATIONS 3
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
 int sem_id;
 int sem_num;
+int reader;
 struct sembuf semaphore;
 
 
@@ -106,17 +111,45 @@ int main(){
 			exit(1);
 		}
 		else if(id == 0){ // Child process
+			id = i + 1;			
 			break;
 		}
 		else{ // Father Process
 			continue;
 		}
 	}
-	printf("Hello\n");	
-	/*while(true) {
+		
+	if(id <= 5) { // Reader Process
+		for(int j = 0; j < ITERATIONS; j++){
+			P(MUTEX);
+			reader++;
+			if(reader == 1){
+				P(WRITER);
+			}	
+			sleep(1);	
+			V(MUTEX);
 
-	}*/
+			printf("Read %d\n", semctl(sem_id, READER, GETVAL, 1));
+			sleep(1);
 
+			P(MUTEX);
+			reader--;
+			if(reader == 0){
+				V(WRITER);
+			}
+			V(MUTEX);
+		}
+	}
+	else {
+		srand(id);
+		for(int j = 0; j < ITERATIONS; j++){
+			
+			P(WRITER);
+			printf("Write %d\n", semctl(sem_id, READER, SETVAL, (rand() %10)));
+			sleep(1);
+			V(WRITER);
+		}
+	}
 
 	return 0;
 }
