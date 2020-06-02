@@ -22,7 +22,7 @@ pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
 int sem_id;
 int sem_num;
-int reader;
+//int reader;
 struct sembuf semaphore;
 
 
@@ -102,7 +102,8 @@ void initApp(){
 
 int main(){
 	initApp();
-	int id;
+	int id = 0;
+	int reader = 0;
 
 	// Fork 5 Reader and 2 writer processes
 	for(int i = 0; i < (NUMBER_OF_WRITERS + NUMBER_OF_READERS); i++) {
@@ -118,36 +119,45 @@ int main(){
 			continue;
 		}
 	}
-		
+	printf("debug 1 __ %d\n", id);	
 	if(id <= 5) { // Reader Process
 		for(int j = 0; j < ITERATIONS; j++){
-			P(MUTEX);
+			printf("debug 2 __ %d\n", id);
+	//		P(MUTEX);
 			reader++;
+			printf("debug 3 __ %d \n", id);
 			if(reader == 1){
-				P(WRITER);
+	//			P(WRITER);
+				printf("debug 4 __ %d \n", id);
 			}	
-			sleep(1);	
-			V(MUTEX);
+	//		sleep(1);	
+	//		V(MUTEX);
 
-			printf("Read %d\n", semctl(sem_id, READER, GETVAL, 1));
-			sleep(1);
+			printf("Read %d\n", semctl(sem_id, READER, GETVAL, 0));
+	//		sleep(1);
 
-			P(MUTEX);
+			printf("debug 4 __ %d\n", id);
+
+	//		P(MUTEX);
 			reader--;
+			printf("debug 5 __ %d\n", id); 
 			if(reader == 0){
-				V(WRITER);
+	//			V(WRITER);
 			}
-			V(MUTEX);
+	//		V(MUTEX);
 		}
 	}
 	else {
 		srand(id);
 		for(int j = 0; j < ITERATIONS; j++){
-			
-			P(WRITER);
-			printf("Write %d\n", semctl(sem_id, READER, SETVAL, (rand() %10)));
-			sleep(1);
-			V(WRITER);
+			printf("debug 6 __ %d\n",id);
+		//	P(WRITER);
+			printf("debug 7 __ %d\n", id);
+			int randoom = rand() % 10;
+			semctl(sem_id, READER, SETVAL, (rand() %10));
+			printf("Write: %d\n", randoom);
+		//	sleep(1);
+			//V(WRITER);
 		}
 	}
 
