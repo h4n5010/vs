@@ -123,41 +123,43 @@ int main(){
 	if(id <= 5) { // Reader Process
 		for(int j = 0; j < ITERATIONS; j++){
 			printf("debug 2 __ %d\n", id);
-	//		P(MUTEX);
+			P(MUTEX);
 			reader++;
 			printf("debug 3 __ %d \n", id);
 			if(reader == 1){
-	//			P(WRITER);
+				P(WRITER);
 				printf("debug 4 __ %d \n", id);
 			}	
-	//		sleep(1);	
-	//		V(MUTEX);
+			sleep(1);
+			printf("check %d\n", id);	
+			V(MUTEX);
+			printf("check %d\n", id);	
 
-			printf("Read %d\n", semctl(sem_id, READER, GETVAL, 0));
-	//		sleep(1);
+			printf("Read %d ----- %d\n", semctl(sem_id, READER, GETVAL, 0), id);
+			sleep(1);
 
-			printf("debug 4 __ %d\n", id);
+			printf("debug 5 __ %d\n", id);
 
-	//		P(MUTEX);
+			P(MUTEX);
 			reader--;
-			printf("debug 5 __ %d\n", id); 
+			printf("debug 6 __ %d\n", id); 
 			if(reader == 0){
-	//			V(WRITER);
+				V(WRITER);
 			}
-	//		V(MUTEX);
+			V(MUTEX);
 		}
 	}
-	else {
+	if(id > 5 && id < 8) {
 		srand(id);
 		for(int j = 0; j < ITERATIONS; j++){
-			printf("debug 6 __ %d\n",id);
-		//	P(WRITER);
-			printf("debug 7 __ %d\n", id);
+			printf("debug 7 __ %d\n",id);
+			P(WRITER);
+			printf("debug 8 __ %d\n", id);
 			int randoom = rand() % 10;
-			semctl(sem_id, READER, SETVAL, (rand() %10));
-			printf("Write: %d\n", randoom);
-		//	sleep(1);
-			//V(WRITER);
+			semctl(sem_id, READER, SETVAL, randoom);
+			printf("Write: %d --------- %d\n", randoom, id);
+			sleep(1);
+			V(WRITER);
 		}
 	}
 
