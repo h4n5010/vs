@@ -9,15 +9,20 @@
 #include <sys/ipc.h>
 #include <time.h>
 
-
-#define PHILOSOPHS 5
+// Globales Defines
 #define HOME "/home/pi/vs"
+#define NUMBER_OF_WRITERS 2
+#define NUMBER_OF_READERS 5
+#define READER 0
+#define WRITER 1
+#define MUTEX 2
 #define ITERATIONS 3
 
 pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
 int sem_id;
 int sem_num;
+int reader;
 struct sembuf semaphore;
 
 
@@ -48,7 +53,7 @@ void P(int sem_num){
 }
 
 // Initializes Semaphores and philosophes
-void init_App(){
+void initApp(){
 
     // Create unique semaphore key
     if((sem_key = ftok(HOME, '1')) < 0){
@@ -60,23 +65,91 @@ void init_App(){
     }
 
     // Open semaphore group and creates one
-    if((sem_id = semget(sem_key, 5, IPC_CREAT|0666)) < 0){
+    if((sem_id = semget(sem_key, 3, IPC_CREAT|0666)) < 0){
         perror("Error in semget\n");
         exit(1);
     }
     else{
         printf("Sem_ID: %d\n", sem_id);
     }
-	
+
+    /*
     // Setup all semaphores in the semaphore group
-    for(int i = 0; i < 5; i++){
+    for(int i = 0; i < 2; i++){
         if(semctl(sem_id, i, SETVAL, 1)<0){
             perror("Error in semctl\n");
             exit(1);
         }
+    }*/
+
+    // Create Reader/Counter semaphore
+    if(semctl(sem_id, 0, SETVAL, 1) < 0) {
+	perror("Error in semctl (Reader/Counter)\n");
+	exit(1);
     }
+    // Create Writer Semaphore
+    if(semctl(sem_id, 1, SETVAL, 1) <0){
+	perror("Error in semctl (Writer)\n");
+	exit(1);
+    }
+    // Create Mutex for atomic access to semaphores
+    if(semctl(sem_id, 2, SETVAL, 1) < 0) {
+	perror("Error in semctl (Mutex)ß\n");
+	exit(1);
+    }
+
 }
 
 int main(){
+	initApp();
+	int id;
+
+	// Fork 5 Reader and 2 writer processes
+	for(int i = 0; i < (NUMBER_OF_WRITERS + NUMBER_OF_READERS); i++) {
+		if((id = fork()) == -1){ // Error path
+			perror("Error in fork()\n");
+			exit(1);
+		}
+		else if(id == 0){ // Child process
+			id = i + 1;			
+			break;
+		}
+		else{ // Father Process
+			continue;
+		}
+	}
+		
+	if(id <= 5) { // Reader Process
+		for(int j = 0; j < ITERATIONS; j++){
+			P(MUTEX);
+			reader++;
+			if(reader == 1){
+				P(WRITER);
+			}	
+			sleep(1);	
+			V(MUTEX);
+
+			printf("Read %d\n", semctl(sem_id, READER, GETVAL, 1));
+			sleep(1);
+
+			P(MUTEX);
+			reader--;
+			if(reader == 0){
+				V(WRITER);
+			}
+			V(MUTEX);
+		}
+	}
+	else {
+		srand(id);
+		for(int j = 0; j < ITERATIONS; j++){
+			
+			P(WRITER);
+			printf("Write %d\n", semctl(sem_id, READER, SETVAL, (rand() %10)));
+			sleep(1);
+			V(WRITER);
+		}
+	}
+
 	return 0;
 }
