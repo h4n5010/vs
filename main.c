@@ -13,18 +13,20 @@
 #define HOME "/home/pi/vs"
 #define NUMBER_OF_WRITERS 2
 #define NUMBER_OF_READERS 5
+
+// Sem_nums for the reader/writer semaphores
 #define READER 0
 #define WRITER 1
 #define MUTEX 2
+
+// Iterations
 #define ITERATIONS 3
 
-pid_t waitpid(pid_t pid, int *status, int ops);
 key_t sem_key;
 int sem_id;
 int sem_num;
-//int reader;
 struct sembuf semaphore;
-int temp =0;
+int temp = 0; // Temp variable for incrementing the reader semaphore
 
 // Leave the sempahore
 void V(int sem_num){
@@ -73,15 +75,6 @@ void initApp(){
         printf("Sem_ID: %d\n", sem_id);
     }
 
-    /*
-    // Setup all semaphores in the semaphore group
-    for(int i = 0; i < 2; i++){
-        if(semctl(sem_id, i, SETVAL, 1)<0){
-            perror("Error in semctl\n");
-            exit(1);
-        }
-    }*/
-
     // Create Reader/Counter semaphore
     if(semctl(sem_id, 0, SETVAL, 0) < 0) {
 	perror("Error in semctl (Reader/Counter)\n");
@@ -101,9 +94,11 @@ void initApp(){
 }
 
 int main(){
+	// Init 3 semaphores
 	initApp();
+	
+	// Process IDs
 	int id = 0;
-	//int reader = 0;
 
 	// Fork 5 Reader and 2 writer processes
 	for(int i = 0; i < (NUMBER_OF_WRITERS + NUMBER_OF_READERS) - 1; i++) {
