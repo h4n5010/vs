@@ -24,7 +24,7 @@ int sem_id;
 int sem_num;
 //int reader;
 struct sembuf semaphore;
-
+int temp =0;
 
 // Leave the sempahore
 void V(int sem_num){
@@ -83,7 +83,7 @@ void initApp(){
     }*/
 
     // Create Reader/Counter semaphore
-    if(semctl(sem_id, 0, SETVAL, 1) < 0) {
+    if(semctl(sem_id, 0, SETVAL, 0) < 0) {
 	perror("Error in semctl (Reader/Counter)\n");
 	exit(1);
     }
@@ -103,10 +103,10 @@ void initApp(){
 int main(){
 	initApp();
 	int id = 0;
-	int reader = 0;
+	//int reader = 0;
 
 	// Fork 5 Reader and 2 writer processes
-	for(int i = 0; i < (NUMBER_OF_WRITERS + NUMBER_OF_READERS); i++) {
+	for(int i = 0; i < (NUMBER_OF_WRITERS + NUMBER_OF_READERS) - 1; i++) {
 		if((id = fork()) == -1){ // Error path
 			perror("Error in fork()\n");
 			exit(1);
@@ -116,51 +116,67 @@ int main(){
 			break;
 		}
 		else{ // Father Process
+			id = 7;
 			continue;
 		}
 	}
-	printf("debug 1 __ %d\n", id);	
+	
 	if(id <= 5) { // Reader Process
+
 		for(int j = 0; j < ITERATIONS; j++){
-			printf("debug 2 __ %d\n", id);
+			// Belege die Mutex, um den Readerzaehler zu erhoehen
 			P(MUTEX);
-			reader++;
-			printf("debug 3 __ %d \n", id);
-			if(reader == 1){
+			temp = semctl(sem_id, READER, GETVAL, 0);
+			temp++;
+			semctl(sem_id, READER, SETVAL, temp);
+			
+			// Belege die Writer Semaphore, falls es sich um den ersten Reader handelt
+			if(semctl(sem_id, READER, GETVAL, 0) == 1){
 				P(WRITER);
-				printf("debug 4 __ %d \n", id);
-			}	
-			sleep(1);
-			printf("check %d\n", id);	
+			}
+
+			// Mutex kann verlassen werden, da Readerzaehler fertig beschrieben wurde	
 			V(MUTEX);
-			printf("check %d\n", id);	
-
-			printf("Read %d ----- %d\n", semctl(sem_id, READER, GETVAL, 0), id);
+			
+			// Beginne des Lesevorgang, kann parallel zu anderen Reader Prozessen erfolgen
+			printf("%d: Ich lese...\n", id);
 			sleep(1);
+			printf("%d: Ich bin fertig mit lesen!\n", id);
 
-			printf("debug 5 __ %d\n", id);
-
+			// Mutex betreten, da der Readerzaehler neu beschrieben wird
 			P(MUTEX);
-			reader--;
-			printf("debug 6 __ %d\n", id); 
-			if(reader == 0){
+
+			temp = semctl(sem_id, READER, GETVAL, 0);
+			temp--;
+			semctl(sem_id, READER, SETVAL, temp);
+			
+			// Falls es sich um den letzten Reader handelt, kann die Writer Semaphore freigegeben werden
+			if(semctl(sem_id, READER, GETVAL, 0) == 0){
 				V(WRITER);
 			}
+
+			// Mutex kann verlassen werden, da Readerzaehler fertig beschrieben wurde
 			V(MUTEX);
 		}
+		// 3 Zyklen abgeschlossen, Reader Prozess fertig
+		printf("%d: Terminiert!\n", id);
 	}
-	if(id > 5 && id < 8) {
-		srand(id);
+
+
+	if(id > 5) { // Writer process
+
 		for(int j = 0; j < ITERATIONS; j++){
-			printf("debug 7 __ %d\n",id);
+			// WRITER Semaphore belegen, damit keine lesenden Prozesse aktiv sind und schreiben
 			P(WRITER);
-			printf("debug 8 __ %d\n", id);
-			int randoom = rand() % 10;
-			semctl(sem_id, READER, SETVAL, randoom);
-			printf("Write: %d --------- %d\n", randoom, id);
+			printf("%d: Ich schreibe...\n", id);
 			sleep(1);
+			printf("%d: Ich bin fertig mit schreiben\n", id);
+
+			// Schreiben abgeschlossen und WRITER Semaphore wieder freigeben
 			V(WRITER);
 		}
+		// 3 Zyklen abgeschlossen, Writer Prozess fertig
+		printf("%d: Terminiert!\n", id);
 	}
 
 	return 0;
