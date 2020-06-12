@@ -10,7 +10,7 @@
 #include <time.h>
 
 // Globales Defines
-#define HOME "/home/pi/vs"
+#define HOME "/home/florian/vs"
 #define NUMBER_OF_WRITERS 2
 #define NUMBER_OF_READERS 5
 
