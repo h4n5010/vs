@@ -4,25 +4,30 @@
 
 int main(){
 
+	printf("vor clnt create\n");
+	struct CLIENT *c1 = clnt_create("localhost", MATHPROG, MATHVERS, "tcp");
+	
+	if(c1 < 0){
+		perror("Error in clnt create!\n");
+		exit(0);
+	}
+	printf("vor struct client\n");	
 
-	clnt_create("localhost", MATHPROG, MATHVERS, "tcp");
-
-	struct CLIENT *c1;	
-
-	intpair * numbers;
-	numbers->a = 5;
-	numbers->b = 6;
-
+	intpair numbers;
+	printf("vor number->a\n");
+	numbers.a = 5;
+	printf("vor number->b\n");
+	numbers.b = 6;
+	printf("nach numbers->b\n");
 	int cube = 5;
 
-	int * result = add_1(numbers, c1);
+	printf("vor add_1\n");
+	int * result = add_1(&numbers, c1);
 	printf("Addition: %d\n", *result);
-	int * result1 = multiply_1(numbers, c1);
+	int * result1 = multiply_1(&numbers, c1);
 	
-	printf("Multiply: %d\n", *result);
+	printf("Multiply: %d\n", *result1);
 	int * result2 = cube_1(&cube, c1);
 
-	printf("Cube: %d\n", *result);
+	printf("Cube: %d\n", *result2);
 }
-
-
