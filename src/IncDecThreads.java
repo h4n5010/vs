@@ -50,6 +50,12 @@ public class IncDecThreads extends Thread {
     }
   }
 
+  public synchronized void demoSync () {
+    for (long i = 0; i < MAX; i++) {
+      zaehler = zaehler + increment;
+    }
+  }
+
   // Einfach rauf oder runter zählen...
   public void demo () {
     for (long i = 0; i < 100; i++) {
@@ -63,7 +69,7 @@ public class IncDecThreads extends Thread {
   }
   
   public void run() {
-    demoUnSync ();  // Unsynchronisiertes Zählen
-    //demoSync ();  // Synchronisiertes Zählen
+    //demoUnSync ();  // Unsynchronisiertes Zählen
+    demoSync ();  // Synchronisiertes Zählen
   }
 }
