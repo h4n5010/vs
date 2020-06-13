@@ -14,7 +14,7 @@ public class UniqueId {
 		out.close();
 	}		
 
-	public int getNext() throws IOException {
+	public synchronized int getNext() throws IOException {
 		DataInputStream in = new DataInputStream(new FileInputStream(file));
 		int oldId = in.readInt();
 		in.close();
