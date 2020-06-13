@@ -1,0 +1,2 @@
+public class Daytime {
+}
