@@ -4,7 +4,8 @@ import java.util.Date;
 
 public class DaytimeClient {
     public static void main(String[] args) throws Exception{
-        String host = args[0];
+        //String host = args[0];
+        String host = "Test"; // Nur für Debugging selbst gesetzt, kann kein argument in intellij übergeben
         //String text = args[1];
         Date date = new Date();
         long time = date.getTime();
