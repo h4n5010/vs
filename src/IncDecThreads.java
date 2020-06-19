@@ -15,6 +15,8 @@ public class IncDecThreads extends Thread {
   public static final long MAX = 10000000;
   // Um die folgende Größe weiterschalten
   private long increment = 0;
+
+  public static Zaehler zaehler;
   
   // Festlegung des Wertes von increment
   public IncDecThreads (long increment) {
@@ -25,6 +27,10 @@ public class IncDecThreads extends Thread {
   public static void main (String[] args) {
     IncDecThreads thread1 = new IncDecThreads(+1);
     IncDecThreads thread2 = new IncDecThreads(-1);
+
+    // Gemeinsames Zaehlerobjekt
+    zaehler = new Zaehler();
+
     long start = System.currentTimeMillis ();
     thread1.start(); 
     thread2.start();
@@ -33,33 +39,36 @@ public class IncDecThreads extends Thread {
       thread2.join ();
     } catch (Exception e) {
     }
-    System.out.println ("zaehler: "+  zaehler + " nach msec: "+(System.currentTimeMillis ()-start));
+    System.out.println ("zaehler: "+  zaehler.zaehler + " nach msec: "+(System.currentTimeMillis ()-start));
   }
 
   
   // Dies ist der Zähler, der von diversen Threads
   // bearbeitet wird.
-  static long zaehler=0;
+  //static long zaehler=0;
   
   
 
   // Unsynchronisiert geht es schnell, aber....
   public void demoUnSync () {
     for (long i = 0; i < MAX; i++) {
-      zaehler = zaehler + increment;
+      zaehler.zaehler += increment;
     }
   }
 
   public synchronized void demoSync () {
-    for (long i = 0; i < MAX; i++) {
-      zaehler = zaehler + increment;
+    synchronized (zaehler){
+      for (long i = 0; i < MAX; i++) {
+        zaehler.zaehler += increment;
+      }
     }
+
   }
 
   // Einfach rauf oder runter zählen...
   public void demo () {
     for (long i = 0; i < 100; i++) {
-      zaehler = zaehler + increment;
+      zaehler.zaehler += increment;
       try {
         sleep ((int)(1000*Math.random ()));
       } catch (Exception e) {
