@@ -17,7 +17,7 @@ public class DaytimeClient {
 
         // Get the current time of the server by RMI and print to console
         try{
-            Daytime remote = (Daytime) Naming.lookup("//" + host + "/daytime");
+            Daytime remote = (Daytime) Naming.lookup("//" + host + "/daytimeserver");
             String received = remote.getDaytime();
             System.out.println("Received time is " + received);
         }

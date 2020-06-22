@@ -7,7 +7,7 @@ public class DaytimeServer {
         Remote remote = new DaytimeImpl();
 
         // Write the remote object to the RMI Registry with the name "daytime"
-        Naming.rebind("daytime", remote);
+        Naming.rebind("daytimeserver", remote);
 
         System.out.println("DaytimeServer gestartet...");
     }

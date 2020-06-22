@@ -19,4 +19,16 @@ public class DaytimeImpl extends UnicastRemoteObject implements Daytime {
         return ts.toString();
 
     }
+
+    // Test, if class DaytimeImpl knows Daytime
+    public static void main(String[] args){
+        try{
+            Daytime test = new DaytimeImpl();
+            test.getDaytime();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        System.out.println("Fertig");
+
+    }
 }
