@@ -4,7 +4,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.sql.Timestamp;
 import java.util.Date;
 
-public class DaytimeImpl extends UnicastRemoteObject implements Daytime {
+public class DaytimeImpl extends UnicastRemoteObject implements Remote {
     public DaytimeImpl() throws RemoteException{
 
     }
