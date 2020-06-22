@@ -8,6 +8,7 @@ public class DaytimeImpl extends UnicastRemoteObject implements Daytime {
     public DaytimeImpl() throws RemoteException{
 
     }
+    @Override
     public String getDaytime(){
         Date date = new Date();
         long time = date.getTime();

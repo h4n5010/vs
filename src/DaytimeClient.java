@@ -12,7 +12,7 @@ public class DaytimeClient {
         Timestamp ts = new Timestamp(time);
         String timestamp = ts.toString();
         System.out.println("Local start time is " + timestamp);
-        Daytime remote = (Daytime) Naming.lookup(host);
+        Daytime remote = (Daytime) Naming.lookup("//" + host + "/localhost");
         String received = remote.getDaytime();
         System.out.println("Received time is " + received);
         time = date.getTime();
