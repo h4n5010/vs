@@ -28,6 +28,7 @@ public class DaytimeClient {
 
 
         // Get the end time of the client and print to console
+        date = new Date();
         time = date.getTime();
         ts = new Timestamp(time);
         timestamp = ts.toString();
